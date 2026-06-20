@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seeker · Metodika hodnocení · Gorillaspace</title>
+<style>
+  @font-face{font-family:'Switzer';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f933710b684038f2cab813_Switzer-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Switzer';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f93371162f36b9ebd13555_Switzer-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Switzer';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f9337105af7e386e1c3d7d_Switzer-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap;}
+  @font-face{font-family:'Switzer';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f9337174380aa4fb8a7b77_Switzer-Italic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:swap;}
+  @font-face{font-family:'Nyghtserif';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f93400a37b560171dae186_NyghtSerif-RegularItalic.woff2') format('woff2');font-weight:400;font-style:italic;font-display:swap;}
+  @font-face{font-family:'Nyghtserif';src:url('https://cdn.prod.website-files.com/6564adbc3817726aaf176564/67f9340033375aa258b1b7ad_NyghtSerif-BoldItalic.woff2') format('woff2');font-weight:700;font-style:italic;font-display:swap;}
+
+  :root{
+    --bg:#FFFFFA; --surface:#FFFFFF; --card:#EBEBE5;
+    --ink:#0D0D0D; --muted:#6E6D66; --line:rgba(13,13,13,0.10); --track:rgba(13,13,13,0.10);
+    --btn-bg:#0D0D0D; --btn-fg:#FFFFFA; --logo:#0D0D0D; --good:#08A85C;
+    --green:#0BD675; --orange:#FFAA32; --red:#E63946; --yellow:#FFE30D; --blue:#1EADFF;
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E0E0C; --surface:#191915; --card:#211F1A;
+    --ink:#F3F3EC; --muted:#9D9C92; --line:rgba(255,255,255,0.11); --track:rgba(255,255,255,0.12);
+    --btn-bg:#0BD675; --btn-fg:#0D0D0D; --logo:#F3F3EC; --good:#35F397;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Switzer','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .italic{font-family:'Nyghtserif',Georgia,serif;font-style:italic;font-weight:400;}
+  .app{width:100%;min-height:100vh;background:var(--bg);}
+  .inner{max-width:1080px;margin:0 auto;padding:0 48px;width:100%;}
+
+  .topbar{background:var(--surface);border-bottom:1px solid var(--line);padding:18px 0;position:sticky;top:0;z-index:10;}
+  .topbar .inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .logo{display:inline-flex;align-items:center;color:var(--logo);}
+  .logo svg{height:27px;width:auto;display:block;}
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .urlchip{font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--line);padding:9px 13px;border-radius:999px;}
+  .btn-icon{width:38px;height:38px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;font-size:16px;display:inline-flex;align-items:center;justify-content:center;}
+
+  .body{padding:44px 0 56px;}
+  .pill{display:inline-block;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;letter-spacing:0.2px;}
+  .pill-green{background:var(--green);color:#0D0D0D;}
+  .pill-orange{background:var(--orange);color:#0D0D0D;}
+  .pill-blue{background:var(--blue);color:#0D0D0D;}
+  .pill-red{background:var(--red);color:#FFFFFA;}
+  .pill-ghost{background:var(--card);color:var(--muted);border:1px solid var(--line);}
+  .h-title{font-size:clamp(34px,4vw,52px);font-weight:700;letter-spacing:-1.5px;line-height:1.04;margin:14px 0 10px;}
+  .h-sub{font-size:16px;color:var(--muted);line-height:1.6;max-width:720px;margin-bottom:30px;}
+
+  .sec-label{margin:46px 0 16px;}
+  .sec-label.first{margin-top:8px;}
+  .sec-note{font-size:14px;color:var(--muted);line-height:1.6;max-width:720px;margin:-6px 0 20px;}
+
+  /* legenda — tři typy čísel */
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-bottom:8px;}
+  .leg{background:var(--card);border-radius:16px;padding:20px 21px;border-left:4px solid var(--line);}
+  .leg.measured{border-left-color:var(--green);}
+  .leg.estimate{border-left-color:var(--orange);}
+  .leg.expert{border-left-color:var(--blue);}
+  .leg h4{font-size:15px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:8px;}
+  .leg .dotc{width:11px;height:11px;border-radius:999px;flex-shrink:0;}
+  .leg p{font-size:13.5px;color:var(--muted);line-height:1.55;}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:14px;}
+  .stat{background:var(--card);border-radius:14px;padding:18px 19px;}
+  .stat .num{font-size:32px;font-weight:700;letter-spacing:-1px;line-height:1;margin-bottom:7px;}
+  .stat .cap{font-size:13px;color:var(--muted);line-height:1.4;}
+
+  /* metrika */
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:14px;}
+  .metric-head{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:16px;}
+  .metric-head .ttl{font-size:18px;font-weight:700;letter-spacing:-0.4px;}
+  .metric-head .w{font-size:13px;color:var(--muted);font-weight:500;}
+  .type{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;margin-left:auto;}
+  .type-m{background:rgba(11,214,117,0.16);color:var(--good);}
+  .type-e{background:rgba(255,170,50,0.18);color:var(--orange);}
+  .type-h{background:rgba(30,173,255,0.16);color:var(--blue);}
+  .facets{display:grid;grid-template-columns:1fr;gap:0;}
+  .facet{display:grid;grid-template-columns:140px 1fr;gap:16px;padding:11px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.55;}
+  .facet:first-child{border-top:none;}
+  .facet .fl{color:var(--muted);font-weight:500;}
+  .facet .fv{color:var(--ink);}
+  .facet .fv b{font-weight:700;}
+  .src{font-style:normal;color:var(--ink);font-weight:500;}
+
+  .callout{background:var(--card);border-radius:16px;padding:22px 24px;margin-top:10px;font-size:14.5px;line-height:1.6;}
+  .callout b{font-weight:700;}
+  .callout .row{display:flex;gap:11px;align-items:flex-start;margin-top:12px;}
+  .callout .row:first-of-type{margin-top:14px;}
+  .callout .k{flex-shrink:0;width:20px;height:20px;border-radius:6px;background:var(--green);color:#0D0D0D;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-top:1px;}
+
+  .footer{margin-top:40px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:22px;}
+  .footer .note{font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:8px;}
+  .disc{font-size:12px;color:var(--muted);opacity:0.8;padding:0 48px 34px;text-align:center;max-width:1080px;margin:0 auto;line-height:1.55;}
+  @media(max-width:620px){.facet{grid-template-columns:1fr;gap:3px;}.inner,.disc{padding-left:22px;padding-right:22px;}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <div class="inner">
+      <span class="logo"><svg xmlns="http://www.w3.org/2000/svg" height="30" viewBox="0 0 190 35" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true" role="img"><g clip-path="url(#clip0_12435_41884)"><path d="M22.2 2.5C22.6 2.5 23 2.5 23.4 2.6C24.8 3 25.4 4.1 25.7 5.4C25.9 5.9 25.9 6.5 26.1 7C26.3 7.3 26.4 7.6 26.6 7.8C26.7 7.9 26.8 8.1 26.9 8.2C26.9 8.3 27 8.3 27 8.4C26.8 8.5 25.8 8 25.5 8C25.2 7.9 24.9 7.9 24.7 8.1C24.4 8.3 24.1 8.7 24.1 9C24 9.4 24.2 9.8 24.4 10.1C24.5 10.1 24.5 10.1 24.6 10C24.6 9.9 24.6 9.7 24.7 9.6C24.7 9.4 24.8 9.2 25 9.1C25.3 9 25.8 9 26.1 9.1C26.3 9.1 26.4 9.2 26.6 9.3C26.7 9.3 26.9 9.3 27 9.4C27 9.4 27 9.4 27 9.4C27.1 9.6 27 10.1 26.9 10.3C26.9 10.2 26.8 10.1 26.7 10.1C26.5 9.9 26.1 9.9 25.8 10C25.6 10.1 25.4 10.2 25.3 10.4C25.1 10.6 25.2 10.9 25.3 11.1C25.4 10.9 25.6 10.6 25.8 10.4C25.9 10.4 25.9 10.4 25.9 10.4C26 10.5 26 10.7 26 10.8C26.2 11.1 26.7 11.7 27.1 11.8C27.2 11.9 27.2 11.9 27.3 11.8C27.3 11.8 27.4 11.7 27.4 11.7C27.4 11.7 27.4 11.7 27.4 11.7C27.4 11.7 27.4 11.7 27.4 11.7C27.7 12 27.9 12.7 27.9 13C27.9 13.1 27.9 13.1 27.9 13.2C27.8 13.2 27.8 13.2 27.7 13.1C27.2 12.9 26.4 13 25.9 13.2C25.7 13.3 25.6 13.4 25.4 13.5C25.6 13.5 25.9 13.5 26.1 13.4C26.5 13.4 27.4 13.3 27.7 13.5C27.8 13.5 27.8 13.5 27.8 13.6C27.8 13.7 27.7 13.9 27.7 14C27.4 14.5 26.8 15 26.2 15.1C25.1 15.4 24.3 14.8 23.5 14.3C24 14.9 24.6 15.3 25.2 15.8C26.9 17.2 28.6 18.9 29.5 21C29.7 21.5 29.9 22 30 22.5C30 22.9 30 23.3 30 23.8C30 24.5 29.9 25.2 29.8 26C29.8 26.1 29.7 26.4 29.6 26.5C29.9 26.5 30.3 26.5 30.6 26.7C30.7 26.8 30.7 26.9 30.7 27.1C30.7 27.2 30.7 27.3 30.6 27.4C30.6 27.4 30.4 27.5 30.3 27.5C30.1 27.5 29.8 27.5 29.6 27.5L28.3 27.5L23.9 27.5L7 27.5L3.2 27.4C2.4 27.5 1.5 27.5 0.7 27.4C0.5 27.4 0.2 27.5 0.1 27.4C0 27.3 0 27.2 0 27.1C0 27 0 26.9 0.1 26.8C0.3 26.6 0.7 26.6 1 26.5C0.8 25.1 1.1 24.4 1.7 23.1C1.8 22.8 2 22.4 2.1 22C2.2 21.2 2 20.4 2 19.6C1.8 17.6 2.2 15.2 3.6 13.6C4.8 12.1 6.8 11.9 8.5 11.4C9.1 11.3 9.6 11.1 10.1 10.8C11 10.2 11.7 9.4 12.5 8.5C12.9 8.1 13.4 7.6 13.9 7.1C14.5 6.6 15.2 6.2 16 5.9C16.3 5.8 16.6 5.7 16.9 5.5C17.3 5.3 17.6 4.8 18 4.5C19.1 3.4 20.6 2.7 22.2 2.5ZM26.3 25.8C26.6 25.7 27 25.5 27.1 25.2C27.2 24.9 27.1 24.7 27 24.4C26.5 23.5 25 22.3 24.1 21.7C23.8 21.4 23.4 21.2 23.1 20.9C23.1 20.3 23.1 19.8 23.1 19.2C22.9 16.2 22.3 13.9 20.7 11.4C20.2 10.5 19.6 9.6 18.8 8.9C18.3 8.5 17.1 7.5 16.5 7.5L16.6 7.5C16.8 7.8 17.2 8.1 17.5 8.4C18 8.8 18.3 9.3 18.7 9.7C21.3 13.1 22.3 17 22.6 21.2C22.7 22.2 22.8 23.2 22.8 24.3C22.8 24.7 22.8 25.1 22.8 25.5C22.8 25.8 22.8 26.2 22.9 26.5C23.4 26.6 23.9 26.6 24.4 26.6C24.8 26.6 25.1 26.6 25.4 26.6C25.5 26.5 25.6 26.5 25.6 26.5C25.8 26.4 26.3 25.9 26.3 25.8ZM15.8 26.5C16.2 26.5 17.1 26.6 17.5 26.5C17.8 26.2 17.9 25.1 17.9 24.6C17.9 24.3 17.9 24 17.8 23.7C17.7 21.8 17 20.5 15.9 18.9C15.7 18.5 15.5 18 15.1 17.7C15.1 17.7 15.1 17.7 15.1 17.7C15.1 18.2 15.2 18.8 15.2 19.4C15.1 21 14.5 22.5 13.8 23.8C13.5 24.2 13.3 24.6 13 25.1C13.4 25.6 13.9 26.4 14.6 26.5C15 26.6 15.4 26.5 15.8 26.5ZM5.6 25.6C5.9 26 6.2 26.4 6.7 26.5C6.7 26.5 6.8 26.5 6.8 26.5C7.4 26.6 8 26.6 8.6 26.6C8.7 26.1 8.6 25.7 8.7 25.2C8.9 23.9 9.2 23 8.2 21.8C8.1 21.6 7.9 21.4 7.8 21.3C7.4 22.3 6.8 23.3 6.3 24.3C6.1 24.7 5.8 25.1 5.6 25.6Z" fill="currentColor"></path><path d="M26.4 10.6C26.6 10.6 26.8 10.9 27 11.1C27.1 11.1 27.2 11.2 27.3 11.3L27.3 11.3C27 11.2 26.7 11 26.5 10.8C26.4 10.8 26.4 10.7 26.4 10.6Z" fill="currentColor"></path></g><path d="M51.1 27.5H48.5L48.2 25.1C47 27 45 27.9 42.6 27.9C37.4 27.9 34 24.2 34 18C34.1 11.9 37.5 8 43.1 8C47 8 50.4 10.2 51.2 14.3H47.3C46.7 12.3 45.1 11.2 43 11.2C39.8 11.2 37.9 13.8 37.9 18C37.9 22.3 39.8 24.8 43 24.8C45.4 24.8 47.3 23.4 47.6 20.3H43.4L43.5 17.4H51.2L51.1 27.5ZM59.7 27.9C55.2 27.9 52.5 24.9 52.5 20C52.5 14.9 55.4 12.1 59.8 12.1C64.2 12.1 66.9 15.1 66.9 20C66.9 25.1 64 27.9 59.7 27.9ZM59.7 25C62 25 63.2 23.2 63.2 20C63.2 16.8 62 15 59.7 15C57.4 15 56.2 16.8 56.2 20C56.2 23.2 57.4 25 59.7 25ZM68.3 27.5L68.4 12.5H72L72 14.7C73 12.9 74.5 12.1 76.1 12.1C76.7 12.1 77.3 12.2 77.6 12.5L77.6 15.6C77.1 15.5 76.5 15.4 75.9 15.4C73.2 15.4 72 17 72 19.5L71.9 27.5H68.3ZM78.3 10.8L78.4 7.3H82L81.9 10.8H78.3ZM78.3 27.5L78.3 12.5H81.9L81.8 27.5H78.3ZM84 27.5L84.1 7.3H87.7L87.6 27.5H84ZM89.7 27.5L89.9 7.3H93.4L93.3 27.5H89.7ZM99 17.4H95.4C95.9 14.1 98.3 12.1 102.1 12.1C106.3 12.1 108.4 14.5 108.4 18L108.4 23.8C108.3 25.7 108.5 26.7 108.8 27.5H105.1C104.9 27 104.8 26.3 104.8 25.5C103.5 27.2 101.7 27.9 99.9 27.9C96.9 27.9 94.8 26.5 94.9 23.6C94.9 21.5 96 20 98.3 19.2C100.3 18.6 102.3 18.4 104.8 18.4L104.8 18C104.8 16.1 103.9 15 101.9 15C100.2 15 99.2 16 99 17.4ZM98.5 23.4C98.5 24.5 99.4 25.3 100.8 25.3C103 25.3 104.7 23.5 104.8 21.2L104.8 20.6C99.7 20.7 98.5 21.9 98.5 23.4ZM113.7 16.5C113.7 20 123.2 17.1 123.1 23.1C123.1 26 120.4 27.9 116.7 27.9C113 27.9 110.3 26.2 109.8 22.6H113.4C113.6 24.2 114.9 25.1 116.8 25.1C118.6 25.1 119.5 24.4 119.5 23.3C119.5 19.9 110.2 22.8 110.3 16.7C110.3 14.3 112.2 12.1 116.1 12.1C119.6 12.1 122.2 13.7 122.6 17.4H119C118.7 15.6 117.7 14.9 116 14.9C114.5 14.9 113.7 15.6 113.7 16.5ZM128 33.7H124.4L124.5 12.5H128.1L128.1 14.2C129 12.8 130.4 12.1 132 12.1C136 12.1 138.3 15.1 138.3 20C138.3 25.1 135.8 27.9 131.9 27.9C130.3 27.9 128.9 27.2 128 25.9L128 33.7ZM131.4 15C129.2 15 128.1 16.8 128 20C128 23.2 129.2 25 131.3 25C133.4 25 134.6 23.2 134.6 20C134.6 16.8 133.5 15 131.4 15ZM143.3 17.4H139.7C140.2 14.1 142.6 12.1 146.4 12.1C150.6 12.1 152.7 14.5 152.7 18L152.6 23.8C152.6 25.7 152.8 26.7 153.1 27.5H149.3C149.1 27 149.1 26.3 149 25.5C147.8 27.2 145.9 27.9 144.1 27.9C141.2 27.9 139.1 26.5 139.1 23.6C139.1 21.5 140.3 20 142.6 19.2C144.6 18.6 146.5 18.4 149 18.4L149 18C149.1 16.1 148.1 15 146.2 15C144.4 15 143.5 16 143.3 17.4ZM142.7 23.4C142.7 24.5 143.6 25.3 145.1 25.3C147.3 25.3 149 23.5 149 21.2L149 20.6C143.9 20.7 142.8 21.9 142.7 23.4ZM168 17.8H164.4C164 15.9 162.9 15 161.4 15C159.1 15 158 16.8 157.9 20C157.9 23.2 159.1 25 161.4 25C163 25 164.1 24.1 164.4 22.4H168C167.3 26.2 164.7 27.9 161.3 27.9C156.9 27.9 154.2 24.9 154.2 20C154.3 14.9 157.1 12.1 161.4 12.1C164.8 12.1 167.5 14 168 17.8ZM183.1 22.6C182.3 26.1 179.6 27.9 176 27.9C171.4 27.9 168.7 24.9 168.7 20C168.7 14.9 171.6 12.1 175.9 12.1C180.3 12.1 183 15 183 19.9L183 20.7H172.4C172.6 23.5 173.8 25 176 25C177.7 25 178.8 24.2 179.3 22.6H183.1ZM175.9 15C174 15 172.9 16.2 172.5 18.5H179.3C178.9 16.2 177.8 15 175.9 15ZM183.9 27.5L183.9 23.6H187.9L187.8 27.5H183.9Z" fill="currentColor"></path><defs><clipPath id="clip0_12435_41884"><rect width="30.7" height="30" fill="currentColor" transform="translate(0 2.5)"></rect></clipPath></defs></svg></span>
+      <div class="controls">
+        <span class="urlchip">interní dokument</span>
+        <button class="btn-icon" id="themeBtn" aria-label="Přepnout světlý/tmavý režim"><span id="ti">☾</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="body">
+    <div class="inner">
+
+      <span class="pill pill-green">Metodika</span>
+      <h1 class="h-title">Jak Seeker <span class="italic">hodnotí</span></h1>
+      <p class="h-sub">Pro každou metriku auditu: co měří, odkud bere data, co je tvrdé číslo a co odhad, a o jaký zdroj se hodnocení opírá. Tahák pro hovor s klientem — ať se každé číslo dá obhájit.</p>
+
+      <!-- LEGENDA -->
+      <div class="sec-label first"><span class="pill pill-green">Tři typy čísel</span></div>
+      <p class="sec-note">Seeker nikdy nehádá. Každé číslo v auditu spadá do jedné ze tří kategorií — a podle toho se s ním v hovoru pracuje.</p>
+      <div class="legend">
+        <div class="leg measured">
+          <h4><span class="dotc" style="background:var(--green)"></span>Měřeno</h4>
+          <p>Tvrdá, reálně posbíraná data. Výkon webu od reálných uživatelů, objemy hledání, pozice v Googlu, existence a text reklam. Fakta, ne názor.</p>
+        </div>
+        <div class="leg estimate">
+          <h4><span class="dotc" style="background:var(--orange)"></span>Odhad příležitosti</h4>
+          <p>Reálná data × transparentní oborový předpoklad. Např. „kolik vám uniká" = skutečný objem × skutečná pozice × oborová CTR křivka. Vždy s uvedenou metodikou.</p>
+        </div>
+        <div class="leg expert">
+          <h4><span class="dotc" style="background:var(--blue)"></span>Expertní hodnocení</h4>
+          <p>Konzistentní úsudek podle marketingových frameworků, opřený o reálná data (text + screenshot webu). Jako názor zkušeného konzultanta, jen jednotně. V auditu označeno.</p>
+        </div>
+      </div>
+
+      <!-- MARKETING OS -->
+      <div class="sec-label"><span class="pill pill-blue">Základ: marketingový mozek (Marketing OS)</span></div>
+      <p class="sec-note">Expertní hodnocení v auditu nejsou náhodné názory AI — stojí na naší vlastní znalostní bázi. Auditní rubrika R1–R7 i frameworky se z ní kompilují.</p>
+      <div class="stats">
+        <div class="stat"><div class="num">~64</div><div class="cap">marketingových zdrojů (knihy + case studies)</div></div>
+        <div class="stat"><div class="num">853</div><div class="cap">„spustitelných" frameworků v 66 souborech</div></div>
+        <div class="stat"><div class="num">13</div><div class="cap">playbooků zaměřených na úkol</div></div>
+        <div class="stat"><div class="num">A+</div><div class="cap">first-party data z reálných kampaní Gorillaspace</div></div>
+      </div>
+      <div class="metric">
+        <div class="metric-head"><span class="ttl">Co v mozku je a jak funguje</span><span class="type type-h">Naše IP</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co to je</span><span class="fv">Strukturovaná znalostní báze (ne chatbot), kterou stavíme a verzujeme jako kód. Z knih a case studies děláme <b>spustitelné frameworky</b>, podle kterých Seeker hodnotí — konzistentně, pokaždé stejně.</span></div>
+          <div class="facet"><span class="fl">Z čeho je</span><span class="fv">Destilát z ~64 autorit: <span class="src">Hormozi, Schwartz, Caples, Ogilvy, Hopkins, Cialdini, Kahneman, Miller (StoryBrand), Voss, Brunson, KlientBoost ad.</span></span></div>
+          <div class="facet"><span class="fl">First-party výhoda</span><span class="fv">Reálné <b>otestované headliny z landing pages Gorillaspace</b> + zlatá pravidla českého copy + behaviorální data z <b>MS Clarity</b> (heatmapy, scroll, rage-clicks). Co reálně funguje na CZ trhu — ne jen teorie z US knih.</span></div>
+          <div class="facet"><span class="fl">Spolehlivost</span><span class="fv">Každý poznatek má <b>známku důkazu A+ až D</b> → víme, co je tvrdě ověřené vs. názor jednoho autora. Kde si autority protiřečí, děláme z toho podmíněná pravidla, ne slepé kopírování.</span></div>
+          <div class="facet"><span class="fl">CZ-native</span><span class="fv">Copy a headliny se píšou nativně česky (kotvené o reálné české vítěze), nikdy doslovný překlad anglických formulí.</span></div>
+        </div>
+      </div>
+      <div class="callout">
+        <b>Jak se mozek napojuje na audit.</b> Z báze se zkompiluje <b>„Auditor pack"</b> — kompaktní výtah (rubrika R1–R7 + relevantní frameworky + first-party headliny), který dostane hodnotící engine. Když mozek vylepšíme (nová kniha, nová data z kampaní), přegenerujeme pack → <b>Seeker je chytřejší bez zásahu do kódu.</b> Proto má každý nález v auditu zdroj (školu): hodnocení je dohledatelné až ke konkrétní marketingové autoritě nebo k našim datům.
+      </div>
+
+      <!-- CELKOVÉ SKÓRE -->
+      <div class="sec-label"><span class="pill pill-green">Celkové skóre webu (0–100)</span></div>
+      <div class="metric">
+        <div class="metric-head"><span class="ttl">Vážený průměr rubriky R1–R7</span><span class="type type-h">Počítá kód, ne AI</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co je to</span><span class="fv">Jedno číslo 0–100 za <b>web copy</b> (texty + struktura stránky). Vznikne z vážených kritérií R1–R7 níže.</span></div>
+          <div class="facet"><span class="fl">Jak se počítá</span><span class="fv">Vážený průměr R1–R7. Skóre sčítá <b>kód deterministicky</b>, ne jazykový model → stejný vstup dá vždy stejné číslo. Nehodnocená kritéria (málo dat) se vyřadí a váhy se přepočítají.</span></div>
+          <div class="facet"><span class="fl">Pojistka</span><span class="fv"><b>Compliance gate:</b> když je web právně rizikový (R7 na dně), skóre se zastropuje na 59 — audit nesmí doporučit nelegální stránku jako „dobrou".</span></div>
+          <div class="facet"><span class="fl">Mimo skóre</span><span class="fv">Reklama a Výkon jsou samostatné kanály (vlastní skóre), do celkového webového čísla nevstupují.</span></div>
+        </div>
+      </div>
+
+      <!-- WEB RUBRIKA -->
+      <div class="sec-label"><span class="pill pill-green">Web rubrika R1–R7</span></div>
+      <p class="sec-note">Sedm kritérií, podle kterých se hodnotí stránka prospekta. Všechna jsou <b>expertní hodnocení</b> (heuristika dle frameworků z marketingové báze) opřené o reálná data — text stránky a její screenshot. V auditu jsou označená „odhad heuristika". Zdroj u každého = marketingová škola, ne interní kód.</p>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R1</span><span class="ttl">Grunt test nad foldem</span><span class="w">váha 20 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Pochopí návštěvník do 5 sekund, co nabízíte, jak mu to pomůže a co má udělat — z horní části stránky?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv"><b>Screenshot</b> horní části stránky (model ji reálně <i>vidí</i> — layout, hero, CTA) + HTML text.</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení opřené o vizuál + text.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Grunt test — Donald Miller (StoryBrand)</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R2</span><span class="ttl">Hook a jasnost headlinu</span><span class="w">váha 15 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Má hlavní nadpis apel a jasnou hodnotu, nebo je generický a nezaujme?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text stránky (nadpisy, hero) + screenshot.</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Apel patří do headlinu — John Caples; Eugene Schwartz</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R3</span><span class="ttl">Awareness a sofistikace match</span><span class="w">váha 12 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Sedí styl sdělení na to, jak moc návštěvník problém/řešení už zná (studené vs. teplé publikum)?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text stránky + kontext (např. objem brand-search z DataForSEO ukáže, jestli chodí lidé na značku).</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Awareness stages — Eugene Schwartz</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R4</span><span class="ttl">Proof — síla a defenzivnost důkazů</span><span class="w">váha 18 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Jsou tvrzení podložená důkazy (recenze, čísla, reference, třetí strana), nebo jen sliby?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text + screenshot (viditelné hvězdičky, počty recenzí, loga, certifikace).</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Proof Checklist — Alex Hormozi</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R5</span><span class="ttl">Síla nabídky a mechanismus</span><span class="w">váha 12 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Je nabídka konkrétní a silná (hodnota, garance, unikátní mechanismus), nebo generická?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text stránky.</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Value equation — Alex Hormozi; Donald Miller</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R6</span><span class="ttl">CTA a tření</span><span class="w">váha 13 %</span><span class="type type-h">Expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Je výzva k akci jasná a nad foldem? Kolik je překážek (dlouhý formulář, cookie modal, přetížené menu)?</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text + screenshot (viditelnost a umístění CTA, překryvy).</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Expertní hodnocení.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Direct + transitional CTA — Donald Miller; CRO subtrakce — KlientBoost</span></span></div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="metric-head"><span class="pill pill-green">R7</span><span class="ttl">EU/ČR compliance</span><span class="w">váha 10 %</span><span class="type type-h">Expertní + právo</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Nelegální nebo rizikové praktiky: fiktivní urgence/scarcity, slevy bez referenční ceny (Omnibus), neoznačené spolupráce, nepodložená superlativa.</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv">Text stránky + texty reklam.</span></div>
+          <div class="facet"><span class="fl">Typ</span><span class="fv">Indikace rizika (ne právní posudek). Skórované kritérium <b>i</b> spouštěč compliance gate.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Zákon 634/1992 Sb., Omnibus 2019/2161/EU, směrnice 2005/29/ES</span></span></div>
+        </div>
+      </div>
+
+      <!-- REKLAMA -->
+      <div class="sec-label"><span class="pill pill-orange">Reklama (Meta) — samostatný kanál</span></div>
+      <div class="metric">
+        <div class="metric-head"><span class="ttl">Kreativní zdraví reklam</span><span class="type type-m">Data měřená · hodnocení expertní</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Kreativní únava (stejný text napříč mnoha reklamami), diverzita a typ kreativ, směr („jaký typ reklam", ne jen „víc"), napojení reklama → landing page.</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv"><b>Meta Ad Library API</b> (oficiální, veřejná data): text kreativ, počet, datum, platforma, page_id. Vidíme i <b>kdo inzeruje na stejná témata</b> (konkurence).</span></div>
+          <div class="facet"><span class="fl">Reálné vs odhad</span><span class="fv"><b>Existence, text a počet reklam = tvrdá data.</b> Posouzení únavy/kvality = expertní hodnocení. Co Ad Library nedává: spend a výkon (ty jsou jen u politických reklam) → nehádáme je.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Meta Ad Library; kreativní frameworky marketingové báze</span></span></div>
+        </div>
+      </div>
+
+      <!-- VÝKON -->
+      <div class="sec-label"><span class="pill pill-orange">Výkon webu — samostatný kanál</span></div>
+      <div class="metric">
+        <div class="metric-head"><span class="ttl">Technický výkon (mobil + desktop)</span><span class="type type-m">Měřeno (reální uživatelé)</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Jak rychle a plynule se web reálně chová — načtení obsahu (LCP) a odezva na interakci (INP), zvlášť pro mobil a desktop.</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv"><b>Google PageSpeed / CrUX</b> — přednostně <b>field data reálných uživatelů</b> z prohlížeče Chrome (ne syntetický lab test).</span></div>
+          <div class="facet"><span class="fl">Reálné vs odhad</span><span class="fv"><b>Měřená data reálných uživatelů.</b> Skóre i metriky jdou z field dat (stabilní). Jediný „standard" jsou hranice good/poor — oficiální prahy Google (Core Web Vitals).</span></div>
+          <div class="facet"><span class="fl">Proč field, ne lab</span><span class="fv">Lab (throttlovaný test) kolísá a nadhodnocuje problém. Field říká, co reálně zažívají vaši návštěvníci → obhajitelné.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">Google PageSpeed Insights / Chrome UX Report</span></span></div>
+        </div>
+      </div>
+
+      <!-- GOOGLE -->
+      <div class="sec-label"><span class="pill pill-orange">Google — „kolik vám uniká"</span></div>
+      <div class="metric">
+        <div class="metric-head"><span class="ttl">Nezachycená vyhledávací poptávka</span><span class="type type-e">Odhad příležitosti</span></div>
+        <div class="facets">
+          <div class="facet"><span class="fl">Co měří</span><span class="fv">Na cílová klíčová slova hledá X lidí měsíčně. Kolik z nich nejde k prospektovi, protože není vidět nahoře (chodí ke konkurenci) — kolik <b>by mohl</b> získat.</span></div>
+          <div class="facet"><span class="fl">Odkud data</span><span class="fv"><b>Objem hledání</b> — DataForSEO (zdroj Google Ads), reálné. <b>Pozice prospekta</b> — DataForSEO SERP (reálný snímek výsledků Googlu). <b>CTR % na pozici</b> — oborová křivka (Backlinko).</span></div>
+          <div class="facet"><span class="fl">Reálné vs odhad</span><span class="fv">Objem a pozice = <b>měřená data</b> (objem je měsíční průměr, pozice je momentka). CTR křivka = <b>oborový předpoklad</b>. Výsledek = obhajitelný <b>odhad příležitosti</b>, ne změřený fakt.</span></div>
+          <div class="facet"><span class="fl">Výpočet</span><span class="fv">objem × (CTR cílové pozice top 3 − CTR aktuální pozice). Když nerankuje → ztrácí celý potenciál top 3. Počítá kód, ne AI.</span></div>
+          <div class="facet"><span class="fl">Zdroj</span><span class="fv"><span class="src">DataForSEO (objem + SERP); CTR křivka: Backlinko 2022 (4 mil. výsledků)</span></span></div>
+        </div>
+      </div>
+
+      <!-- NEDĚLÁ -->
+      <div class="sec-label"><span class="pill pill-blue">Co Seeker nikdy nedělá</span></div>
+      <div class="callout">
+        <b>Zásada č. 1 — nikdy nehádat.</b> Audit se opírá výhradně o reálně posbíraná data. Co nejde dohledat nebo ověřit, skončí v sekci „mezery v datech" (transparentně přiznáno), nikdy se nedomýšlí.
+        <div class="row"><span class="k">✓</span><span><b>Chybějící data ≠ špatný web.</b> Když se něco nenačte, prospekt za to není penalizován — kritérium se prostě nehodnotí.</span></div>
+        <div class="row"><span class="k">✓</span><span><b>Tvrdá čísla počítá kód</b> (celkové skóre, výkon, ztracené prokliky) — deterministicky, ne jazykový model. Reprodukovatelné.</span></div>
+        <div class="row"><span class="k">✓</span><span><b>Citujeme školy, ne kódy.</b> U nálezu je vždy zdroj („Grunt test — Donald Miller"), ne interní označení.</span></div>
+        <div class="row"><span class="k">✓</span><span><b>Lidská kontrola před sdílením.</b> Každý audit projde revizí a úpravou člověkem, než ho prospekt uvidí. Interní prodejní playbook se ke klientovi nikdy nedostane.</span></div>
+      </div>
+
+      <div class="footer">
+        <span class="note"><svg width="15" height="15" viewBox="0 0 100 100" aria-hidden="true"><g fill="currentColor"><rect x="44" y="6" width="12" height="88" rx="3"/><rect x="6" y="44" width="88" height="12" rx="3"/><rect x="44" y="6" width="12" height="88" rx="3" transform="rotate(45 50 50)"/><rect x="44" y="6" width="12" height="88" rx="3" transform="rotate(-45 50 50)"/></g></svg> Seeker · Auditor — Gorillaspace</span>
+        <span class="note">Interní metodika · v1</span>
+      </div>
+
+    </div>
+  </main>
+</div>
+<div class="disc">Interní dokument Gorillaspace — popis metodiky hodnocení nástroje Seeker / Auditor. Slouží jako podklad pro obhajobu auditu před klientem. Vizuální identita, barvy a fonty převzaty z webu Gorillaspace.</div>
+
+<script>
+  (function(){
+    var root=document.documentElement;
+    var ti=document.getElementById('ti');
+    function setTheme(t){root.setAttribute('data-theme',t);try{localStorage.setItem('gs-theme',t);}catch(e){}ti.textContent=(t==='dark'?'☀':'☾');}
+    var saved=null;try{saved=localStorage.getItem('gs-theme');}catch(e){}
+    if(!saved)saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+    setTheme(saved);
+    document.getElementById('themeBtn').addEventListener('click',function(){
+      setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>
